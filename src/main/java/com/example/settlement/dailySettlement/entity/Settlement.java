@@ -37,4 +37,15 @@ public class Settlement {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public static Settlement create(Long partnerId, BigDecimal totalAmount, LocalDate paymentDate) {
+        Settlement settlement = new Settlement();
+        settlement.setPartnerId(partnerId);
+        settlement.setTotalAmount(totalAmount);
+        settlement.setStatus("completed");
+        settlement.setPaymentDate(paymentDate);
+        settlement.setCreatedAt(LocalDateTime.now());
+        settlement.setUpdatedAt(LocalDateTime.now());
+        return settlement;
+    }
 }

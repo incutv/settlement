@@ -11,4 +11,5 @@ import java.util.*;
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
     List<Payment> findByPaymentDateBetween(LocalDateTime startDate, LocalDateTime endDate);
     // 기본 CRUD 메서드는 JpaRepository가 제공
+    Optional<Payment> findByImpUid(String impUid);
 }

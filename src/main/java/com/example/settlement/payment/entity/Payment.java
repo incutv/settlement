@@ -1,18 +1,21 @@
 package com.example.settlement.payment.entity;
 
+import com.example.settlement.payment.entity.request.PaymentReq;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "payments")
-@Getter
-@Setter
-@NoArgsConstructor
 public class Payment {
 
     @Id
@@ -34,19 +37,66 @@ public class Payment {
     @Column(name = "payment_date", nullable = false)
     private LocalDateTime paymentDate;
 
+    @Column(name = "imp_uid", length = 50)
+    private String impUid;
+
     @Column(name = "payment_method", length = 50)
     private String paymentMethod;
 
-    @Column(name = "pg_provider_id")
-    private Long pgProviderId;
+    @Column(name = "merchant_uid", length = 50)
+    private String merchantUid;
+
+    @Column(name = "pg_provider", length = 20)
+    private String pgProvider;
+
+    @Column(name = "pg_type", length = 20)
+    private String pgType;
+
+    @Column(name = "pg_tid", length = 50)
+    private String pgTid;
 
     @Column(name = "status", length = 20)
-    private String status = "Completed";
+    private String status;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "card_name", length = 20)
+    private String cardName;
+
+    @Column(name = "card_number", length = 50)
+    private String cardNumber;
+
+    @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
-}
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+        paymentDate = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    public static Payment of(PaymentReq paymentReq) {
+        return Payment.builder()
+                .partnerId(paymentReq.getPartnerId())
+                .userId(paymentReq.getUserId())
+                .orderId(paymentReq.getOrderId())
+                .impUid(paymentReq.getImpUid())
+                .paymentMethod(paymentReq.getPayMethod())
+                .merchantUid(paymentReq.getMerchantUid())
+                .paymentAmount(BigDecimal.valueOf(paymentReq.getPaidAmount()))
+                .pgProvider(paymentReq.getPgProvider())
+                .pgType(paymentReq.getPgType())
+                .pgTid(paymentReq.getPgTid())
+                .status(paymentReq.getStatus())
+                .cardName(paymentReq.getCardName())
+                .cardNumber(paymentReq.getCardNumber())
+                .build();
+    }
+}
